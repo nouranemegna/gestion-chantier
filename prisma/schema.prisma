@@ -1,0 +1,299 @@
+// Gestion des coûts de construction des maisons et des bâtiments.
+//
+// Principes :
+// - les montants sont en FCFA entiers : le franc CFA n'a pas de subdivision en usage ;
+// - rien ne se supprime : une dépense fausse est rejetée ou annulée, avec son motif,
+//   et le journal garde qui a fait quoi, avec l'avant et l'après ;
+// - chaque observation porte une date, pour les séries chronologiques et les prévisions.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// PostgreSQL : local en développement, Neon en production. Neon passe par un
+// pooler de connexions ; les migrations, elles, exigent une connexion directe.
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  INGENIEUR
+  CLIENT
+  CHEF_CHANTIER
+}
+
+enum TypeOuvrage {
+  MAISON_INDIVIDUELLE
+  IMMEUBLE
+  BATIMENT_COMMERCIAL
+  BATIMENT_PUBLIC
+  AUTRE
+}
+
+enum StatutProjet {
+  PREPARATION
+  EN_COURS
+  SUSPENDU
+  TERMINE
+}
+
+// Les cinq postes de dépense du cahier des charges.
+enum Categorie {
+  MATERIAUX
+  MAIN_OEUVRE
+  TRANSPORT
+  LOCATION_EQUIPEMENT
+  AUTRES
+}
+
+enum Statut {
+  EN_ATTENTE
+  VALIDEE
+  REJETEE
+  // Une dépense validée puis reconnue fausse : elle reste visible, barrée, avec son motif.
+  ANNULEE
+}
+
+enum ModePaiement {
+  ESPECES
+  VIREMENT
+  MOBILE_MONEY
+  CHEQUE
+}
+
+model Utilisateur {
+  id                Int       @id @default(autoincrement())
+  prenom            String
+  nom               String
+  // Identifiant de connexion : le téléphone, que tout le monde a sur un chantier.
+  telephone         String    @unique
+  email             String?
+  motDePasseHash    String
+  role              Role
+  // Un compte n'est jamais supprimé : il est désactivé, ses saisies restent attribuées.
+  actif             Boolean   @default(true)
+  derniereConnexion DateTime?
+  creeLe            DateTime  @default(now())
+
+  projetsClient   Projet[]     @relation("ClientProjet")
+  projetsChef     Projet[]     @relation("ChefProjet")
+  projetsCrees    Projet[]     @relation("CreateurProjet")
+  depenses        Depense[]    @relation("DepenseAuteur")
+  depensesDecides Depense[]    @relation("DepenseDecideur")
+  versements      Versement[]  @relation("VersementAuteur")
+  versementsDecides Versement[] @relation("VersementDecideur")
+  releves         Releve[]     @relation("ReleveAuteur")
+  relevesDecides  Releve[]     @relation("ReleveDecideur")
+  avenants        Avenant[]
+  journal         Journal[]
+}
+
+model Projet {
+  id            Int          @id @default(autoincrement())
+  code          String       @unique
+  nom           String
+  description   String?
+  localisation  String
+  type          TypeOuvrage
+  // Surface bâtie en m² : base du coût au m², qui rend les projets comparables.
+  surface       Float
+  niveaux       Int          @default(1)
+  dateDebut     DateTime
+  dateFinPrevue DateTime
+  dateFinReelle DateTime?
+  statut        StatutProjet @default(PREPARATION)
+  motifStatut   String?
+  clientId      Int
+  chefId        Int?
+  creeParId     Int
+  creeLe        DateTime     @default(now())
+
+  client     Utilisateur  @relation("ClientProjet", fields: [clientId], references: [id])
+  chef       Utilisateur? @relation("ChefProjet", fields: [chefId], references: [id])
+  creePar    Utilisateur  @relation("CreateurProjet", fields: [creeParId], references: [id])
+  lots       Lot[]
+  lignes     LigneBudget[]
+  avenants   Avenant[]
+  depenses   Depense[]
+  versements Versement[]
+  releves    Releve[]
+  journal    Journal[]
+}
+
+// Lot de travaux : Terrassement, Fondations, Élévation, Toiture…
+model Lot {
+  id         Int    @id @default(autoincrement())
+  projetId   Int
+  nom        String
+  ordre      Int    @default(0)
+  // Dernier avancement VALIDÉ, en % (0 à 100) : sert à la valeur acquise.
+  avancement Float  @default(0)
+
+  projet   Projet        @relation(fields: [projetId], references: [id])
+  lignes   LigneBudget[]
+  depenses Depense[]
+  releves  Releve[]
+
+  @@unique([projetId, nom])
+}
+
+// Budget prévisionnel ventilé : un montant par lot et par catégorie.
+model LigneBudget {
+  id             Int       @id @default(autoincrement())
+  projetId       Int
+  lotId          Int
+  categorie      Categorie
+  // Montant prévu au départ ; on ne le modifie plus une fois le projet lancé :
+  // une révision passe par un avenant, pour garder l'écart initial / révisé.
+  montantInitial Int
+
+  projet   Projet    @relation(fields: [projetId], references: [id])
+  lot      Lot       @relation(fields: [lotId], references: [id])
+  avenants Avenant[]
+
+  @@unique([lotId, categorie])
+}
+
+// Révision du budget d'une ligne, positive ou négative, toujours motivée.
+model Avenant {
+  id       Int      @id @default(autoincrement())
+  projetId Int
+  ligneId  Int
+  montant  Int
+  motif    String
+  date     DateTime
+  auteurId Int
+  creeLe   DateTime @default(now())
+
+  projet Projet      @relation(fields: [projetId], references: [id])
+  ligne  LigneBudget @relation(fields: [ligneId], references: [id])
+  auteur Utilisateur @relation(fields: [auteurId], references: [id])
+}
+
+// Catalogue commun des articles (ciment, fer, sable, journée de maçon…) :
+// il regroupe les achats d'un même article pour l'analyse des prix unitaires.
+model Article {
+  id          Int       @id @default(autoincrement())
+  designation String    @unique
+  unite       String
+  categorie   Categorie
+  actif       Boolean   @default(true)
+
+  depenses Depense[]
+}
+
+model Fournisseur {
+  id        Int     @id @default(autoincrement())
+  nom       String  @unique
+  telephone String?
+  activite  String?
+  actif     Boolean @default(true)
+
+  depenses Depense[]
+}
+
+model Depense {
+  id            Int       @id @default(autoincrement())
+  projetId      Int
+  lotId         Int
+  categorie     Categorie
+  articleId     Int?
+  libelle       String
+  quantite      Float
+  unite         String
+  prixUnitaire  Int
+  // Calculé par le serveur : arrondi(quantité × prix unitaire). Jamais saisi.
+  montant       Int
+  date          DateTime
+  fournisseurId Int?
+  // Numéro de facture ou de reçu, et clé de la photo sur Backblaze B2.
+  reference     String?
+  fichierCle    String?
+  observation   String?
+  statut        Statut    @default(EN_ATTENTE)
+  // Motif du rejet ou de l'annulation.
+  motif         String?
+  auteurId      Int
+  decideParId   Int?
+  decideLe      DateTime?
+  creeLe        DateTime  @default(now())
+
+  projet      Projet       @relation(fields: [projetId], references: [id])
+  lot         Lot          @relation(fields: [lotId], references: [id])
+  article     Article?     @relation(fields: [articleId], references: [id])
+  fournisseur Fournisseur? @relation(fields: [fournisseurId], references: [id])
+  auteur      Utilisateur  @relation("DepenseAuteur", fields: [auteurId], references: [id])
+  decidePar   Utilisateur? @relation("DepenseDecideur", fields: [decideParId], references: [id])
+
+  @@index([projetId, date])
+  @@index([articleId])
+}
+
+// Fonds versés par le client : il déclare, l'ingénieure confirme la réception.
+model Versement {
+  id          Int          @id @default(autoincrement())
+  projetId    Int
+  montant     Int
+  date        DateTime
+  mode        ModePaiement
+  reference   String?
+  statut      Statut       @default(EN_ATTENTE)
+  motif       String?
+  auteurId    Int
+  decideParId Int?
+  decideLe    DateTime?
+  creeLe      DateTime     @default(now())
+
+  projet    Projet       @relation(fields: [projetId], references: [id])
+  auteur    Utilisateur  @relation("VersementAuteur", fields: [auteurId], references: [id])
+  decidePar Utilisateur? @relation("VersementDecideur", fields: [decideParId], references: [id])
+
+  @@index([projetId, date])
+}
+
+// Relevé d'avancement d'un lot : pourcentage CUMULÉ réalisé à une date, avec photo facultative.
+model Releve {
+  id          Int       @id @default(autoincrement())
+  projetId    Int
+  lotId       Int
+  date        DateTime
+  pourcentage Float
+  commentaire String?
+  photoCle    String?
+  statut      Statut    @default(EN_ATTENTE)
+  motif       String?
+  auteurId    Int
+  decideParId Int?
+  decideLe    DateTime?
+  creeLe      DateTime  @default(now())
+
+  projet    Projet       @relation(fields: [projetId], references: [id])
+  lot       Lot          @relation(fields: [lotId], references: [id])
+  auteur    Utilisateur  @relation("ReleveAuteur", fields: [auteurId], references: [id])
+  decidePar Utilisateur? @relation("ReleveDecideur", fields: [decideParId], references: [id])
+
+  @@index([projetId, date])
+}
+
+// Traçabilité : toute écriture et toute connexion, en écriture seule.
+model Journal {
+  id       Int      @id @default(autoincrement())
+  date     DateTime @default(now())
+  auteurId Int
+  projetId Int?
+  action   String
+  entite   String
+  entiteId Int?
+  // Phrase lisible : « Dépense validée : 40 sacs de ciment, 220 000 FCFA ».
+  resume   String
+  avant    Json?
+  apres    Json?
+
+  auteur Utilisateur @relation(fields: [auteurId], references: [id])
+  projet Projet?     @relation(fields: [projetId], references: [id])
+
+  @@index([projetId, date])
+  @@index([date])
+}

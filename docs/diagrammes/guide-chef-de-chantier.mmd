@@ -1,0 +1,25 @@
+flowchart TD
+  X1["L'ingénieure crée votre compte"]:::autre
+  X2["L'ingénieure crée le projet,<br/>vous désigne chef de chantier<br/>et le passe « En cours »"]:::autre
+  X3["L'ingénieure tient le catalogue<br/>articles et fournisseurs"]:::autre
+  A["1 · Première connexion<br/>téléphone et mot de passe"]:::compte
+  B["2 · Choisir son mot de passe"]:::compte
+  C["3 · Installer l'application<br/>sur le téléphone"]:::compte
+  D["4 · Saisir une dépense<br/>quantité × prix unitaire"]:::saisie
+  E["5 · Photo ou n° du reçu"]:::saisie
+  F["6 · Corriger tant que<br/>la dépense est en attente"]:::saisie
+  V["L'ingénieure valide<br/>ou rejette avec un motif"]:::autre
+  G["7 · Ressaisir une dépense<br/>rejetée"]:::saisie
+  H["8 · Déclarer l'avancement<br/>d'un lot, avec photo"]:::avance
+  W["L'ingénieure valide<br/>l'avancement"]:::autre
+  X1 --> A --> B --> C
+  X2 --> D
+  X3 --> D
+  B --> D --> E
+  D --> F --> V
+  V --> G
+  X2 --> H --> W
+  classDef compte fill:#fdf2f8,stroke:#db2777,color:#262b33
+  classDef saisie fill:#eef4fb,stroke:#2a78d6,color:#262b33
+  classDef avance fill:#e8f7f0,stroke:#1baf7a,color:#262b33
+  classDef autre fill:#f4f4f5,stroke:#8a8f98,color:#4e5560,stroke-dasharray: 5 4

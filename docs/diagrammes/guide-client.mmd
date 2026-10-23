@@ -1,0 +1,23 @@
+flowchart TD
+  X1["L'ingénieure crée votre compte<br/>et votre projet"]:::autre
+  A["1 · Première connexion<br/>téléphone et mot de passe"]:::compte
+  B["2 · Choisir son mot de passe"]:::compte
+  C["3 · Tableau de bord<br/>de votre projet"]:::suivi
+  X2["Le chef déclare l'avancement,<br/>l'ingénieure le valide"]:::autre
+  X3["Le chef saisit les dépenses,<br/>l'ingénieure les valide"]:::autre
+  D["4 · Suivre l'avancement<br/>et les photos"]:::suivi
+  E["5 · Consulter les dépenses<br/>et le budget"]:::suivi
+  F["6 · Déclarer un versement"]:::verse
+  Y["L'ingénieure confirme<br/>la réception"]:::autre
+  G["7 · Analyse, rapport PDF<br/>et export Excel"]:::suivi
+  X1 --> A --> B --> C
+  X2 --> D
+  X3 --> E
+  C --> D
+  C --> E
+  C --> F --> Y
+  E --> G
+  classDef compte fill:#fdf2f8,stroke:#db2777,color:#262b33
+  classDef suivi fill:#eef4fb,stroke:#2a78d6,color:#262b33
+  classDef verse fill:#e8f7f0,stroke:#1baf7a,color:#262b33
+  classDef autre fill:#f4f4f5,stroke:#8a8f98,color:#4e5560,stroke-dasharray: 5 4

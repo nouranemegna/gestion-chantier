@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Guide de première utilisation de l'Ingénieure - Nourane Génie Civil</title>
+<link rel="stylesheet" href="style-documents.css">
+</head>
+<body>
+
+<section class="garde">
+  <div>
+    <div class="bande"></div>
+    <img class="logo" src="img/logo-nourane.png" alt="Logo Nourane Génie Civil">
+    <h1>Guide de première utilisation</h1>
+    <p class="sous">L'Ingénieure, propriétaire de l'application<br>Ce qu'il faut faire, et dans quel ordre</p>
+    <span class="ue">Ingénieure</span>
+  </div>
+  <div class="bas">
+    <table>
+      <tr><td style="width:40%"><b>Application</b></td><td>Nourane Génie Civil, gestion des coûts de construction</td></tr>
+      <tr><td><b>Pour aller plus loin</b></td><td>Manuel de l'Ingénieure</td></tr>
+      <tr><td><b>Date</b></td><td>Octobre 2026</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="chapitre">
+  <h2>Ce qui dépend de quoi</h2>
+  <p>L'application démarre vide : c'est l'ingénieure qui la met en place. Sans compte, ni le client ni le chef de chantier ne peuvent se connecter ; sans projet lancé, le chef ne peut rien saisir ; sans budget, aucun écart ne se calcule. L'ordre des premières étapes compte donc.</p>
+  <p>Ensuite, le travail devient régulier : le chef de chantier saisit les dépenses et l'avancement, le client déclare ses versements, et vous validez. Plus vous validez vite, plus le tableau de bord, les alertes et l'analyse sont à jour.</p>
+  <p>Le schéma de la page suivante montre ces dépendances. Une flèche signifie « doit exister avant ». Les cases en pointillés sont faites par d'autres que vous.</p>
+</section>
+
+<section class="chapitre paysage">
+  <h2>Le schéma des dépendances</h2>
+  <figure class="diagramme"><img src="img/guide-ingenieure.svg" style="max-height:150mm;border:none" alt="Dépendances entre les actions de l'ingénieure"><figcaption>Figure 1 — Ce qui doit exister avant chaque action</figcaption></figure>
+</section>
+
+<section class="chapitre">
+  <h2>Les étapes, une par une</h2>
+
+  <h3>Votre compte et ceux des autres</h3>
+  <div class="etape"><div class="num">1</div><div><b>Première connexion</b> avec le numéro de téléphone et le mot de passe du compte de l'ingénieure.</div></div>
+  <div class="etape"><div class="num">2</div><div><b>Changez ce mot de passe</b> : votre nom, en bas du menu, puis « Changer mon mot de passe ». 8 caractères au moins.</div></div>
+  <div class="etape"><div class="num">3</div><div><b>Créez les comptes</b> des clients et des chefs de chantier (menu Utilisateurs) : prénom, nom, téléphone, rôle et mot de passe provisoire, que vous leur communiquez.</div></div>
+  <div class="etape"><div class="num">4</div><div><b>Complétez le catalogue</b> (menu Articles et fournisseurs) : les articles que vous achetez souvent, avec leur unité, et vos fournisseurs habituels. Le chef de chantier pourra en ajouter.</div></div>
+
+  <h3>Chaque nouveau projet</h3>
+  <div class="etape"><div class="num">5</div><div><b>Créez le projet</b> (Projets, Nouveau projet) : nom, type d'ouvrage, localisation, <b>surface bâtie</b>, dates, client, chef de chantier et lots de travaux.</div></div>
+  <div class="etape"><div class="num">6</div><div><b>Saisissez le budget prévisionnel</b> dans la grille lot × catégorie de l'onglet Budget, puis « Enregistrer le budget ». Il reste modifiable tant que le projet est en préparation.</div></div>
+  <div class="etape"><div class="num">7</div><div><b>Lancez le projet</b> : onglet Paramètres, statut « En cours ». Le budget initial est figé ; le chef peut saisir.</div></div>
+
+  <h3>Le suivi, chaque semaine</h3>
+  <div class="etape"><div class="num">8</div><div><b>Validez ou rejetez les dépenses</b> en attente (onglet Dépenses, filtre « En attente »). Vérifiez celles marquées « Prix inhabituel ». Un rejet demande un motif.</div></div>
+  <div class="etape"><div class="num">9</div><div><b>Validez l'avancement</b> déclaré par le chef de chantier (onglet Avancement, tableau Relevés).</div></div>
+  <div class="etape"><div class="num">10</div><div><b>Confirmez les versements</b> déclarés par le client, une fois les fonds reçus (onglet Versements).</div></div>
+  <div class="etape"><div class="num">11</div><div><b>Révisez le budget par avenant</b> quand une hausse de prix ou un ajout du client l'impose, toujours avec un motif (onglet Budget).</div></div>
+
+  <h3>L'analyse et les décisions</h3>
+  <div class="etape"><div class="num">12</div><div><b>Lisez le tableau de bord et ses alertes</b>, puis l'onglet Analyse : écarts par poste, prévision du coût final, valeur acquise, Pareto, prix inhabituels.</div></div>
+  <div class="etape"><div class="num">13</div><div><b>Éditez le rapport PDF</b> ou l'export Excel pour le client, et comparez les projets entre eux (menu Comparaison).</div></div>
+</section>
+
+<section class="chapitre">
+  <h2>Ce qu'il faut avant chaque action</h2>
+  <table>
+    <tr><th style="width:30%">Pour…</th><th style="width:44%">Il faut d'abord…</th><th>Où</th></tr>
+    <tr><td>Créer un projet</td><td>Le compte du client (rôle Client)</td><td>Utilisateurs</td></tr>
+    <tr><td>Désigner le chef de chantier</td><td>Son compte (rôle Chef de chantier)</td><td>Nouveau projet ou Paramètres</td></tr>
+    <tr><td>Saisir le budget initial</td><td>Le projet et ses lots, au statut « En préparation »</td><td>Budget</td></tr>
+    <tr><td>Laisser le chef saisir</td><td>Le projet « En cours » et le chef désigné</td><td>Paramètres</td></tr>
+    <tr><td>Réviser le budget</td><td>Le projet lancé ; un motif</td><td>Budget, Nouvel avenant</td></tr>
+    <tr><td>Rejeter ou annuler une dépense</td><td>Un motif ; pour annuler, une dépense déjà validée</td><td>Dépenses</td></tr>
+    <tr><td>Obtenir le coût final estimé</td><td>Des dépenses validées et un avancement validé</td><td>Tableau de bord, Analyse</td></tr>
+    <tr><td>Obtenir la prévision par régression</td><td>Au moins 3 jours de dépenses validées, projet non terminé</td><td>Analyse</td></tr>
+    <tr><td>Juger un prix unitaire</td><td>L'article du catalogue choisi, et au moins 4 achats validés de cet article</td><td>Analyse, Dépenses</td></tr>
+    <tr><td>Comparer le coût au m²</td><td>La surface bâtie de chaque projet</td><td>Comparaison</td></tr>
+    <tr><td>Joindre les photos</td><td>Le stockage des photos configuré (Backblaze B2)</td><td>Formulaires de dépense et d'avancement</td></tr>
+  </table>
+  <div class="encadre attention"><b>Rien ne se supprime.</b> Une dépense fausse se rejette (si elle est en attente) ou s'annule (si elle est validée), avec son motif ; un compte se désactive ; un projet se termine. Le journal garde toutes les opérations, avec leur auteur, leur date et, pour une correction, l'ancienne et la nouvelle valeur.</div>
+</section>
+
+</body>
+</html>

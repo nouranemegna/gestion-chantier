@@ -1,0 +1,35 @@
+flowchart TD
+  A["1 · Première connexion<br/>compte de l'ingénieure"]:::compte
+  B["2 · Choisir son mot de passe"]:::compte
+  C["3 · Créer les comptes<br/>clients et chefs de chantier"]:::compte
+  R["4 · Articles et fournisseurs<br/>catalogue commun"]:::compte
+  D["5 · Créer le projet<br/>client, chef, surface, lots"]:::projet
+  E["6 · Saisir le budget ventilé<br/>lot × catégorie"]:::projet
+  F["7 · Passer le projet<br/>« En cours »"]:::projet
+  X1["Le chef saisit les dépenses<br/>et l'avancement"]:::autre
+  X2["Le client déclare<br/>ses versements"]:::autre
+  G["8 · Valider ou rejeter<br/>les dépenses"]:::suivi
+  H["9 · Valider l'avancement<br/>des lots"]:::suivi
+  I["10 · Confirmer<br/>les versements"]:::suivi
+  J["11 · Avenant au budget<br/>si une révision s'impose"]:::projet
+  K["12 · Tableau de bord, alertes,<br/>analyse statistique"]:::analyse
+  L["13 · Rapport PDF, Excel,<br/>comparaison des projets"]:::analyse
+  A --> B --> C --> D
+  B --> R
+  D --> E --> F
+  F --> X1
+  F --> X2
+  R --> X1
+  X1 --> G
+  X1 --> H
+  X2 --> I
+  F --> J
+  G --> K
+  H --> K
+  I --> K
+  K --> L
+  classDef compte fill:#fdf2f8,stroke:#db2777,color:#262b33
+  classDef projet fill:#eef4fb,stroke:#2a78d6,color:#262b33
+  classDef suivi fill:#e8f7f0,stroke:#1baf7a,color:#262b33
+  classDef analyse fill:#f3effd,stroke:#6250d6,color:#262b33
+  classDef autre fill:#f4f4f5,stroke:#8a8f98,color:#4e5560,stroke-dasharray: 5 4
